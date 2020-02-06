@@ -1,0 +1,774 @@
+@import url("https://fonts.googleapis.com/css?family=Roboto:300,400,500");
+
+* {
+
+  margin: 0;
+
+  box-sizing: border-box;
+
+}
+
+
+
+html {
+
+ /* --card-color: #cacaca;*/
+
+ --card-color:#ed901c;
+
+  --text-color: #e1e1e1;
+
+}
+
+
+
+body {
+
+  font-family: 'Roboto', sans-serif;
+
+}
+
+
+
+.tips {
+
+  position: fixed;
+
+  bottom: 0;
+
+  width: 100%;
+
+  height: 30px;
+
+  background: #f1f1f1;
+
+  line-height: 30px;
+
+  font-size: 14px;
+
+  padding: 2px 15px;
+
+}
+
+
+
+.container {
+
+  position: absolute;
+
+  display: flex;
+
+  flex-direction: row;
+
+  /*align-items: center;*/
+
+  margin: auto;
+
+  top: 0;
+
+  bottom: 0;
+
+  left: 0;
+
+  right: 0;
+
+  width: 680px;
+
+}
+
+.container .col1 {
+
+  -webkit-perspective: 1000;
+
+          perspective: 1000;
+
+  -webkit-transform-style: preserve-3d;
+
+          transform-style: preserve-3d;
+
+}
+.container .col2 {
+margin: 9px -197px ;
+padding: 0px;
+}
+
+.container .col1 .card {
+
+  position: inherit;
+
+  width: 119px;
+
+  height: 72px;
+  margin-left: 128px;
+
+  border-radius: 17px;
+
+  box-shadow: 0 19px 13px -2px rgba(0, 0, 0, 0.2);
+
+  transition: all 1s;
+
+  -webkit-transform-style: preserve-3d;
+
+          transform-style: preserve-3d;
+
+}
+
+.container .col1 .card .front {
+
+  position: inherit;
+
+  margin-left:-7px;
+
+  background: var(--card-color);
+
+  border-radius: 17px;
+
+  padding: 37px;
+
+  width: 107%;
+
+  height: 0%;
+
+  margin-top: -11px;
+
+  transform: translateZ(1px);
+
+  -webkit-transform: translateZ(1px);
+
+  transition: background 0.3s;
+
+  z-index: 50;
+
+  background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0) 1px, rgba(255, 255, 255, 0.03) 2px, rgba(255, 255, 255, 0.04) 3px, rgba(255, 255, 255, 0.05) 4px), -webkit-linear-gradient(-245deg, rgba(255, 255, 255, 0) 40%, rgba(255, 255, 255, 0.2) 70%, rgba(255, 255, 255, 0) 90%);
+
+  -webkit-backface-visibility: hidden;
+
+  backface-visibility: hidden;
+
+  box-shadow: 0 19px 13px -2px rgba(0, 0, 0, 0.2);
+
+}
+
+.container .col1 .card .front .type {
+
+  position: absolute;
+
+  width: 75px;
+
+  height: 45px;
+
+  top: 17px;
+
+  right: 37px;
+
+}
+
+.container .col1 .card .front .type img {
+
+  width: 80%;
+
+  float: right;
+
+  margin-top: -13%;
+
+  margin-right: -2px;
+
+}
+
+.container .col1 .card .front .card_number {
+
+  position: absolute;
+
+  font-size: 26px;
+
+  font-weight: 500;
+
+  top: 110px;
+
+  color: var(--text-color);
+
+  transition: color 0.5s;
+
+}
+
+.container .col1 .card .front .date {
+
+  position: absolute;
+
+  bottom: 40px;
+
+  right: 55px;
+
+  width: 90px;
+
+  height: 35px;
+
+  color: var(--text-color);
+
+  transition: color 0.5s;
+
+}
+
+.container .col1 .card .front .date .date_value {
+
+  font-size: 12px;
+
+  position: absolute;
+
+  margin-left: 22px;
+
+  margin-top: 12px;
+
+  color: var(--text-color);
+
+  font-weight: 500;
+
+  transition: color 0.5s;
+
+}
+
+.container .col1 .card .front .date:after {
+
+  content: 'MONTH / YEAR';
+
+  position: absolute;
+
+  display: block;
+
+  font-size: 7px;
+
+  margin-left: 20px;
+
+}
+
+.container .col1 .card .front .date:before {
+
+  position: absolute;
+
+  display: block;
+
+  font-size: 8px;
+
+  margin-top: 8px;
+
+}
+
+.container .col1 .card .front .fullname {
+
+  position: absolute;
+
+  font-size: 20px;
+
+  bottom: 40px;
+
+  color: var(--text-color);
+
+  transition: color 0.5s;
+
+}
+
+.container .col1 .card .back {
+
+  position: absolute;
+
+  width: 100%;
+
+  border-radius: 17px;
+
+  height: 100%;
+
+  background: var(--card-color);
+
+  -webkit-transform: rotateY(180deg);
+
+          transform: rotateY(180deg);
+
+}
+
+.container .col1 .card .back .magnetic {
+
+  position: absolute;
+
+  width: 100%;
+
+  height: 50px;
+
+  background: rgba(0, 0, 0, 0.7);
+
+  margin-top: 25px;
+
+}
+
+.container .col1 .card .back .bar {
+
+  position: absolute;
+
+  width: 80%;
+
+  height: 37px;
+
+  background: rgba(255, 255, 255, 0.7);
+
+  left: 10px;
+
+  margin-top: 100px;
+
+}
+
+.container .col1 .card .back .seccode {
+
+  font-size: 13px;
+
+  color: var(--text-color);
+
+  font-weight: 500;
+
+  position: absolute;
+
+  top: 100px;
+
+  right: 40px;
+
+}
+
+.container .col1 .card .back .chip {
+
+  bottom: 45px;
+
+  left: 10px;
+
+}
+
+.container .col1 .card .back .disclaimer {
+
+  position: absolute;
+
+  width: 65%;
+
+  left: 80px;
+
+  color: #f1f1f1;
+
+  font-size: 8px;
+
+  bottom: 55px;
+
+}
+
+.container .col2 input {
+
+ 
+
+  width: 191px;
+
+  padding-left: 10px;
+
+  padding-top: 0px;
+
+  padding-bottom: 4px;
+
+  margin: 7px;
+
+  margin-right: 47px;
+
+  font-size: 15px;
+
+  border-radius: 8px;
+
+  background: rgba(0, 0, 0, 0.25);
+
+
+
+  transition: background 0.5s;
+
+}
+
+.container .col2 .expire  {
+
+
+
+  width: 100px;
+
+  height: 28px;
+
+  padding-left: 10px;
+
+  padding-top: 0px;
+
+  padding-bottom: 4px;
+
+  margin: 1px;
+
+  margin-right: 47px;
+
+  font-size: 15px;
+
+  border-radius: 8px;
+
+  background: rgba(0, 0, 0, 0.25);
+
+
+
+  transition: background 0.5s;
+
+}
+
+.container .col2 .expires  {
+
+
+
+  width: 100px;
+
+  height: 28px;
+
+  padding-left: 10px;
+
+  padding-top: 0px;
+
+  padding-bottom: 4px;
+
+  margin: -11px;
+
+  margin-right: 47px;
+
+  font-size: 15px;
+
+  border-radius: 8px;
+
+  background: rgba(0, 0, 0, 0.25);
+
+
+
+  transition: background 0.5s;
+
+}
+
+
+
+.container .col2 .cvc  {
+
+
+
+  width: 90px;
+
+  height: 28px;
+
+  padding-left: 10px;
+
+  padding-top: 0px;
+
+  padding-bottom: 4px;
+
+  margin: 7px;
+
+  margin-right: 47px;
+
+  font-size: 15px;
+
+  border-radius: 8px;
+
+  background: rgba(0, 0, 0, 0.25);
+
+ 
+
+  transition: background 0.5s;
+
+}
+
+
+
+.container .col2 .document  {
+
+
+
+  width: 60px;
+
+  height: 28px;
+
+  padding-left: 0px;
+
+  padding-top: 0px;
+
+  padding-bottom: 4px;
+
+  margin: 7px;
+
+  margin-right: -5px;
+
+  font-size: 15px;
+
+  border-radius: 20px;
+
+  background: rgba(0, 0, 0, 0.25);
+
+  
+
+  transition: background 0.5s;
+
+}
+
+.container .col2 .docunumber content input:invalid {
+
+
+
+    border: 2px solid red;
+
+}
+
+
+
+.container .col2 .docunumber  {
+
+
+
+  width: 170px;
+
+  height: 28px;
+
+  padding-left: 10px;
+
+  padding-top: 0px;
+
+  padding-bottom: 4px;
+
+  margin: 7px;
+
+  margin-right: 47px;
+
+  font-size: 15px;
+
+  border-radius: 20px;
+
+  background: rgba(0, 0, 0, 0.25);
+
+
+
+  transition: background 0.5s;
+
+}
+
+
+
+.container .col2 .email input  {
+
+  
+
+  width: 238px;
+
+  height: 30px;
+
+  padding-left: 90px;
+
+  padding-top: 4px;
+
+  padding-bottom: 4px;
+
+  margin: 7px;
+
+  margin-right: 47px;
+
+  font-size: 15px;
+
+  border-radius: 20px;
+
+  background: rgba(0, 0, 0, 0.25);
+
+
+  transition: background 0.5s;
+
+}
+
+
+
+.container .col2 input:focus {
+
+  outline-width: 0;
+
+  background:#e59c1bb3;
+
+  transition: background 0.5s;
+
+}
+
+.container .col2 label {
+
+  font-size: 14px;
+
+  color: #444;
+
+  margin-bottom: -6px;
+
+}
+
+.container .col2 .ccv {
+
+  width: 40%;
+
+}
+
+@media screen and (max-width: 600px) {
+
+  .container .col2 .buy {
+
+    margin-left: -75px;
+
+  }
+
+}
+
+.container .col2 .buy {
+
+  top: 455px;
+
+  width: 140px;
+
+  height: 33px;
+
+  position: fixed;
+
+  display: unset;
+
+  margin-left: -47px;
+
+  border-radius: 3px;
+
+  border: none;
+
+   background: #ff9500;
+
+  color: white;
+
+  transition: background 0.4s;
+
+  cursor: pointer;
+
+}
+
+.container .col2 .buy i {
+
+  font-size: 20px;
+
+}
+
+.container .col2 .buy:hover {
+
+  background: #3594A9;
+
+  transition: background 0.4s;
+
+}
+
+
+
+.chip {
+
+  position: absolute;
+
+  width: 55px;
+
+  height: 40px;
+
+  background: #bbb;
+
+  border-radius: 7px;
+
+}
+
+.chip:after {
+
+  content: '';
+
+  display: block;
+
+  width: 35px;
+
+  height: 25px;
+
+  border-radius: 4px;
+
+  position: absolute;
+
+  top: 0;
+
+  bottom: 0;
+
+  margin: auto;
+
+  background: #ddd;
+
+}
+
+@media only screen and (max-width: 380px) {
+.container .col1 .card .front{
+ 
+ }
+ .container .col1 .card {
+ margin-left: 94px !important;
+}
+ .container .col2 .buy {
+  width: 113px  !important;
+  margin-left: -60px !important;
+  height: 33px  !important;
+  top: 460px !important;
+ }
+
+}
+@media only screen and (max-width: 440px) {
+.container .col1 .card .front{
+ 
+ }
+ .container .col1 .card {
+ margin-left: 87px;
+}
+ .container .col2 .buy {
+  width: 100px;
+  margin-left: -55px;
+  height: 33px;
+  top: 472px;
+ }
+ .container .col2 .input{
+    margin: 4px;
+ }
+
+.container .col2 .expire {  
+  height: 25px;
+    margin: 1px;   
+}
+ .container .col2 label {
+    margin-bottom: -6px;
+}
+
+}
+
+
+@media only screen and (max-width: 1440px) {
+.container .col1 .card .front{
+ 
+ }
+ .container .col1 .card {
+     margin-left: 127px;
+}
+ .container .col2 .buy {
+ width: 132px;
+    margin-left: -1px;
+    height: 33px;
+    top: 440px;
+ }
+ .container .col2 .input{
+    margin: 4px;
+ }
+
+.container .col2 .expire {  
+  height: 25px;
+    margin: 1px;   
+}
+ .container .col2 label {
+    margin-bottom: -6px;
+}
+
+}
+
+
+
+
+ 
