@@ -29,7 +29,7 @@ if ( $test=="false") {
    $testt=true;
 
 }
-
+$ipcustomer = isset($ip) ? $ip : '190.00.00.94' ;
 
 
 require_once 'lib/vendor/autoload.php';
@@ -98,7 +98,7 @@ $subpay = $epayco->subscriptions->charge(array(
   "token_card" => $token,
   "doc_type" => $doc,
   "doc_number" => $docunumber,
-  "ip"=>$ip,
+  "ip"=>$ipcustomer,
   "cell_phone"=> $telephone,
   "url_response" => $response,
   "url_confirmation" => $confirmacion,
@@ -140,7 +140,7 @@ $subpay = $epayco->subscriptions->charge(array(
   "token_card" => $token,
   "doc_type" => $doc,
   "doc_number" => $docunumber,
-  "ip"=>$ip,
+  "ip"=>$ipcustomer,
   "cell_phone"=> $telephone,
   "url_response" => $response,
   "url_confirmation" => $confirmacion,
@@ -206,7 +206,7 @@ $subpay = $epayco->subscriptions->charge(array(
   "token_card" => $token,
   "doc_type" => $doc,
   "doc_number" => $docunumber,
-  "ip"=>$ip,
+  "ip"=>$ipcustomer,
   "cell_phone"=> $telephone,
   "url_response" => $response,
   "url_confirmation" => $confirmacion,
@@ -249,7 +249,7 @@ $subpay = $epayco->subscriptions->charge(array(
   "token_card" => $token,
   "doc_type" => $doc,
   "doc_number" => $docunumber,
-  "ip"=>$ip,
+  "ip"=>$ipcustomer,
   "cell_phone"=> $telephone,
   "url_response" => $response,
   "url_confirmation" => $confirmacion,
