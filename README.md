@@ -43,5 +43,5 @@
 
 
 ## Versiones
-* [ePayco plugin WooCommerce v9.3.x,  WooCommerce Suscripcion v2.6.x](https://github.com/richi-alvarez/suscriptions-woocommerce01/releases/tag/v2.6.1).
+* [ePayco plugin WooCommerce v9.3.x,  WooCommerce Suscripcion v2.6.x](https://github.com/epayco/suscripciones_woocommerce/releases/tag/v2.6).
 
