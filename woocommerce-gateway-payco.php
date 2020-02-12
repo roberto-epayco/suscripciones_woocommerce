@@ -1247,6 +1247,8 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
             $product_name = $product_plan['name'];
             $product_id = $product_plan['id'];
 
+            $plan_tax = $subscription->get_total_tax();
+            $plant_base = $subscription->get_subtotal();
             $plan_code = "$product_name-$product_id";
             $plan_code = $this->currency !== $order_currency ? "$plan_code-$order_currency" : $plan_code;
             $plan_code = $quantity > 1 ? "$plan_code-$quantity" : $plan_code;
@@ -1259,6 +1261,8 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                     "name" => "Plan $plan_code",
                     "description" => "Plan $plan_code",
                     "currency" => $order_currency,
+                    "tax" =>  $plan_tax,
+                    "base_tax" =>  $plant_base,
                 ],
                 $this->getTrialDays($subscription),
                 $this->intervalAmount($subscription)
@@ -1376,8 +1380,12 @@ function action_order_status_changed( $order_id ){
    
                 $datasuscription=json_encode($arrayName2);
                 $amoutTotal =0;
+                $tax=0;
+                $tax_base=0;
                 for ($i=$suscription_count; $i >=0 ; $i--) {
                 $amoutTotal += $arrayName2[$i]["amount"];
+                $tax+=$arrayName2[$i]["tax"];
+                $tax_base+=$arrayName2[$i]["base_tax"];
                 }
 
                 $amountPayment=number_format($amoutTotal, 2);
@@ -1395,19 +1403,19 @@ function action_order_status_changed( $order_id ){
                 $email_billing=$subscription->billing_email;
                 $order_data = $subscription->get_data();
                 $order_billing_city = $order_data['billing']['city'];
-                $tax=$subscription->get_total_tax();
+
                 $tax=number_format($tax, 2);
 
                 if((int)$tax>0){
 
-                $base_tax2=$subscription->get_total()-$tax;
+                $base_tax2=$tax_base;
 
 
                 $base_tax=number_format($base_tax2, 2);
  
                 }else{
 
-                $base_tax=number_format($amoutTotal, 2);
+                $base_tax=number_format($tax_base, 2);
                 $tax=number_format(0, 2);
                 }
 
