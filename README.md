@@ -32,7 +32,7 @@
  con los respectivos valores para la suscripcion
 10. Realiza una o varias compras para comprobar que todo esté bien.
 11. Si todo está bien recuerda cambiar la variable Modo Prueba a NO y empieza a recibir pagos de forma instantánea y segura con ePayco.
-12. Tener en cuenta que para la cancelación de la suscripciones se debe de realizar por medio de un ticket de soporte, informando sobre la cancelación de la suscipión y enviar la "ref_payco" que vienen siendo la referencia identificadora de la suscripción.
+12. Tener en cuenta que para la cancelación de la suscripciones se debe de realizar por medio de un [ticket de soporte](https://epayco.co/contacto/), informando sobre la cancelación de la suscipión y enviar la **"ref_payco"** que vienen siendo la referencia identificadora de la suscripción .
 
 ## Pasos
 
