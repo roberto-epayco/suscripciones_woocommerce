@@ -2302,7 +2302,7 @@ return data;
                   values: json
                 },
                  success: function(done){
-                   console.log('LLEGO',done)
+                   //console.log('LLEGO',done)
                // callback(done.data.token)
                  },
                  error: function() {
@@ -2933,7 +2933,7 @@ return data;
 
             if (result) {
              // debugger
-console.log('sisas')
+//console.log('sisas')
               callback(error, result);
 
             }

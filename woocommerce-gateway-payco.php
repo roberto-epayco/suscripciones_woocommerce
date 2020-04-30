@@ -3,1250 +3,370 @@
 
 
 /**
-
-
-
  * @since             1.0.0
-
-
-
  * @package           ePayco_Woocommerce_sub
-
-
-
  *
-
-
-
  * @wordpress-plugin
-
-
-
  * Plugin Name:       ePayco WooCommerce  Suscripction
-
-
-
  * Description:       Plugin ePayco WooCommerce.
-
-
-
  * Version:           3.7.11
-
-
-
  * Author:            Ricardo saldarriaga
-
-
-
  * Author URI:        
-
-
-
  *Lice
-
-
-
-
-
-
  * Domain Path:       /languages
-
-
-
  */
-
-
-
-
-
-
-
 /*
 *Stores the location of the WordPress directory of functions, classes, and core content.
-
 */
 
    if (!defined('WPINC')) {
     die;
 }
 
-
-
-
-
-
-
 require_once(dirname(__FILE__) . '/lib/EpaycoOrders.php');
 
-
-
-
 if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
-
 
     add_action('plugins_loaded', 'init_epayco_woocommerce_sub', 0);
 
     function init_epayco_woocommerce_sub()
 
-
-
     {
-
-
         if (!class_exists('WC_Payment_Gateway')) {
-
             return;
-
-
         }
 
-
-
-
-
-
-
-        class WC_ePayco_sub extends WC_Payment_Gateway
-
-
-
+    class WC_ePayco_sub extends WC_Payment_Gateway
         {
-
-
-
-            public function __construct()
-
-
-
+         public function __construct()
             {
-
-
-
                 $this->id = 'epayco_sub';
-
-
-
                 $this->icon = 'https://369969691f476073508a-60bf0867add971908d4f26a64519c2aa.ssl.cf5.rackcdn.com/logos/logo_epayco_200px.png';
-
-
-
                 $this->method_title = __('ePayco Checkout Suscription', 'epayco_woocommerce_sub');
-
-
-
                 $this->method_description = __('Suscripciones atravez de tarjetas de crédito.', 'epayco_woocommerce_sub');
-
-
-
-                $this->order_button_text = __('To subscribe', 'epayco_woocommerce_sub');
-
-
-
+                $this->order_button_text = __('Pay', 'epayco_woocommerce_sub');
                 $this->has_fields = true;
-
-
-
                $this->supports = [
             'subscriptions'
         ];
-
-
-
-
-
-
-
                 $this->init_form_fields();
-
-
-
                 $this->init_settings();
-
-
-
-
-
-
-
                 $this->msg['message']   = "";
-
-
-
                 $this->msg['class']     = "";
-
-
-
-
-
-
-
                 $this->title = $this->get_option('epayco_title_sub');
-
                 $this->currency = get_option('woocommerce_currency');
-
                 $this->epayco_customerid_sub = $this->get_option('epayco_customerid_sub');
-
-
-
                 $this->epayco_secretkey_sub = $this->get_option('epayco_secretkey_sub');
-
-
-
                 $this->epayco_publickey_sub = $this->get_option('epayco_publickey_sub');
-
-
-
                 $this->epayco_p_key_sub = $this->get_option('epayco_p_key_sub');
-
-
-
                 $this->description = $this->get_option('description');
-
-
-
                 $this->epayco_testmode_sub = $this->get_option('epayco_testmode_sub');
-
-
 
                 if ($this->get_option('epayco_reduce_stock_pending_sub') !== null ) {
 
-
-
                     $this->epayco_reduce_stock_pending_sub = $this->get_option('epayco_reduce_stock_pending_sub');
-
-
-
                 }else{
-
-
-
-
-
-
 
                      $this->epayco_reduce_stock_pending_sub = "yes";
 
-
-
                 }
-
-
                 $this->epayco_endorder_state_sub=$this->get_option('epayco_endorder_state_sub');
-
-
-
                 $this->epayco_url_response_sub=$this->get_option('epayco_url_response_sub');
-
-
-
                 $this->epayco_url_confirmation_sub=$this->get_option('epayco_url_confirmation_sub');
-
-
-
                 $this->epayco_lang_sub=$this->get_option('epayco_lang_sub')?$this->get_option('epayco_lang_sub'):'es';
-
-
-
-
-
-
-
-
-
-
 
                 add_filter('woocommerce_thankyou_order_received_text', array(&$this, 'order_received_message'), 10, 2 );
                 add_action('woocommerce_order_status_changed', 'action_order_status_changed');
-
-
-
                 add_action('ePayco_init_sub', array( $this, 'ePayco_successful_request_sub'));
-
-
-
                 add_action('woocommerce_receipt_' . $this->id, array(&$this, 'receipt_page'));
-
-
-
-                add_action( 'woocommerce_api_' . strtolower( get_class( $this ) ), array( $this, 'check_ePayco_response_sub' ) );
-
-    
+                add_action( 'woocommerce_api_' . strtolower( get_class( $this ) ), array( $this, 'check_ePayco_response_sub' ) );    
                 add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
-
-
-
               add_action( 'init', 'woocommerce_clear_cart_url' );
-
-
                 if ($this->epayco_testmode_sub == "yes") {
-
-
-
                     if (class_exists('WC_Logger')) {
-
-
-
                         $this->log = new WC_Logger();
-
-
-
                     } else {
-
-
-
                         $this->log = WC_ePayco_sub::woocommerce_instance()->logger();
-
-
-
                     }
-
-
-
                 }
 
-
-
             }
-
-
-
-
-
 
 
             function order_received_message( $text, $order ) {
-
-
-
                 if(!empty($_GET['msg'])){
-
-
-
                     return $text .' '.$_GET['msg'];
-
-
-
                 }
-
-
-
                 return $text;
-
-
-
             }
-
-
-
-
-
-
 
             public function is_valid_for_use()
-
-
-
             {
 
-
-
                 return in_array(get_woocommerce_currency(), array('COP', 'USD'));
-
-
-
             }
-
-
-
 
             public function admin_options()
 
-
-
             {
-
-
 
                 ?>
 
-
-
                 <style>
-
-
-
-                    tbody{
-
-
-
-
-
-
-
+                  tbody{
                     }
-
-
-
-
-
-
-
                     .epayco-table tr:not(:first-child) {
-
-
-
                         border-top: 1px solid #ededed;
-
-
-
                     }
-
-
-
-
-
-
-
                     .epayco-table tr th{
-
-
-
                             padding-left: 15px;
-
-
-
                             text-align: -webkit-right;
-
-
-
                     }
-
-
-
-
-
-
-
                     .epayco-table input[type="text"]{
-
-
-
                             padding: 8px 13px!important;
-
-
-
                             border-radius: 3px;
-
-
-
                             width: 100%!important;
-
-
-
                     }
-
-
-
                     .epayco-table .description{
-
-
-
                         color: #afaeae;
-
-
-
                     }
-
-
-
                     .epayco-table select{
-
-
-
                             padding: 8px 13px!important;
-
-
-
                             border-radius: 3px;
-
-
-
                             width: 100%!important;
-
-
-
                             height: 37px!important;
-
-
-
                     }
-
-
-
                     .epayco-required::before{
-
-
-
                         content: '* ';
-
-
-
                         font-size: 16px;
-
-
-
                         color: #F00;
-
-
-
                         font-weight: bold;
-
-
-
                     }
-
-
 
                 </style>
 
 
 
                 <div class="container-fluid">
-
-
-
                     <div class="panel panel-default" style="">
-
-
-
                         <img  src="https://369969691f476073508a-60bf0867add971908d4f26a64519c2aa.ssl.cf5.rackcdn.com/logos/logo_epayco_200px.png">
-
-
-
                         <div class="panel-heading">
-
-
-
                             <h3 class="panel-title"><i class="fa fa-pencil"></i>Configuración <?php _e('ePayco', 'epayco_woocommerce_sub'); ?></h3>
-
-
-
                         </div>
-
-
 
                         <div style ="color: #31708f; background-color: #d9edf7; border-color: #bce8f1;padding: 10px;border-radius: 5px;">
-
-
-
                             <b>Este modulo le permite aceptar pagos seguros por la plataforma de pagos ePayco</b>
-
-
-
                             <br>Si el cliente decide pagar por ePayco, el estado del pedido cambiara a ePayco Esperando Pago
-
-
-
                             <br>Cuando el pago sea Aceptado o Rechazado ePayco envia una configuracion a la tienda para cambiar el estado del pedido.
-
-
-
                         </div>
-
 
 
                         <div class="panel-body" style="padding: 15px 0;background: #fff;margin-top: 15px;border-radius: 5px;border: 1px solid #dcdcdc;border-top: 1px solid #dcdcdc;">
-
-
-
                                 <table class="form-table epayco-table">
-
-
-
                                 <?php
-
-
-
                                     if ($this->is_valid_for_use()) :
-
-
-
                                         $this->generate_settings_html();
-
-
-
                                     else :
-
-
-
                                         if ( is_admin() && ! defined( 'DOING_AJAX')) {
-
-
 
                                             echo '<div class="error"><p><strong>' . __( 'ePayco: Requiere que la moneda sea USD O COP', 'epayco-woocommerce' ) . '</strong>: ' . sprintf(__('%s', 'woocommerce-mercadopago' ), '<a href="' . admin_url() . 'admin.php?page=wc-settings&tab=general#s2id_woocommerce_currency">' . __( 'Click aquí para configurar!', 'epayco_woocommerce_sub') . '</a>' ) . '</p></div>';
 
-
-
                                         }
-
-
 
                                     endif;
 
-
-
                                 ?>
-
-
 
                                 </table>
 
-
-
                         </div>
 
-
-
                     </div>
-
-
 
                 </div>
 
 
-
                 <?php
 
-
-
             }
-
-
-
-
-
-
 
             public function init_form_fields()
 
-
-
             {
 
-
-
                 $this->form_fields = array(
-
-
-
                     'enabled' => array(
-
-
-
                         'title' => __('Habilitar/Deshabilitar', 'epayco_woocommerce_sub'),
-
-
-
                         'type' => 'checkbox',
-
-
-
                         'label' => __('Habilitar ePayco Checkout', 'epayco_woocommerce_sub'),
-
-
-
                         'default' => 'yes'
-
-
-
                     ),
-
-
-
-
-
-
-
                     'epayco_title_sub' => array(
-
-
-
                         'title' => __('<span class="epayco-required">Título</span>', 'epayco_woocommerce_sub'),
-
-
-
                         'type' => 'text',
-
-
-
                         'description' => __('Corresponde al titulo que el usuario ve durante el checkout.', 'epayco_woocommerce_sub'),
-
-
-
                         'default' => __('Checkout ePayco (Suscripciones)', 'epayco_woocommerce_sub'),
-
-
-
-
-
                     ),
-
-
-
-
-
-
-
                     'description' => array(
-
-
-
                         'title' => __('<span class="epayco-required">Descripción</span>', 'epayco_woocommerce_sub'),
-
-
-
-                        'type' => 'textarea',
-
-
-
-                        'description' => __('Corresponde a la descripción que verá el usuaro durante el checkout', 'epayco_woocommerce_sub'),
-
-
-
-                        'default' => __('Checkout ePayco (Suscripciones por Tarjetas de crédito)', 'epayco_woocommerce_sub'),
-
-
-
-
+                            'type' => 'textarea',
+                            'description' => __('Corresponde a la descripción que verá el usuaro durante el checkout', 'epayco_woocommerce_sub'),
+                            'default' => __('Checkout ePayco (Suscripciones por Tarjetas de crédito)', 'epayco_woocommerce_sub'),
 
                     ),
-
-
-
-
-
-
 
                     'epayco_customerid_sub' => array(
-
-
-
                         'title' => __('<span class="epayco-required">P_CUST_ID_CLIENTE</span>', 'epayco_woocommerce_sub'),
-
-
-
                         'type' => 'text',
-
-
-
-                        'description' => __('ID de cliente que lo identifica en ePayco. Lo puede encontrar en su panel de clientes en la opción configuración.', 'epayco_woocommerce_sub'),
-
-
-
+                       'description' => __('ID de cliente que lo identifica en ePayco. Lo puede encontrar en su panel de clientes en la opción configuración.', 'epayco_woocommerce_sub'),
                         'default' => '',
-
-
-
-
-
                         'placeholder' => '',
-
-
-
                     ),
-
-
-
-
-
-
 
                     'epayco_secretkey_sub' => array(
-
-
-
                         'title' => __('<span class="epayco-required">PRIVATE_KEY</span>', 'epayco_woocommerce_sub'),
-
-
-
                         'type' => 'text',
-
-
-
                         'description' => __('LLave para autenticar y consumir los servicios de ePayco, Proporcionado en su panel de clientes en la opción configuración.', 'epayco_woocommerce_sub'),
-
-
-
                         'default' => '',
-
-
-
                         'placeholder' => ''
-
-
-
                     ),
-
-
-
-
-
-
 
                     'epayco_publickey_sub' => array(
-
-
-
                         'title' => __('<span class="epayco-required">PUBLIC_KEY</span>', 'epayco_woocommerce_sub'),
-
-
-
                         'type' => 'text',
-
-
-
                         'description' => __('LLave para autenticar y consumir los servicios de ePayco, Proporcionado en su panel de clientes en la opción configuración.', 'epayco_woocommerce_sub'),
-
-
-
                         'default' => '',
-
-
-
                         'placeholder' => ''
-
-
-
                     ),
-
-
 
                      'epayco_p_key_sub' => array(
-
-
-
                         'title' => __('<span class="epayco-required">P_KEY</span>', 'epayco_woocommerce_sub'),
-
-
-
                         'type' => 'text',
-
-
-
                         'description' => __('LLave para firmar la información enviada y recibida de ePayco. Lo puede encontrar en su panel de clientes en la opción configuración.', 'epayco_woocommerce_sub'),
-
-
-
                         'default' => '',
-
-
-
                         'placeholder' => ''
-
-
-
-                    ),
-
-
-
-
-
-
-
-
+                   ),
 
                     'epayco_testmode_sub' => array(
-
-
-
-                        'title' => __('Sitio en pruebas', 'epayco_woocommerce_sub'),
-
-
-
-                        'type' => 'checkbox',
-
-                        
-
+                       'title' => __('Sitio en pruebas', 'epayco_woocommerce_sub'),
+                        'type' => 'checkbox',                    
                         'label' => __('Habilitar el modo de pruebas', 'epayco_woocommerce_sub'),
-
-
-
                         'description' => __('Habilite para realizar pruebas', 'epayco_woocommerce_sub'),
-
-
-
-                        'default' => 'no',
-
-
-
+                       'default' => 'no',
                     ),
 
                     'epayco_endorder_state_sub' => array(
-
-
-
                         'title' => __('Estado Final del Pedido', 'epayco_woocommerce_sub'),
-
-
-
                         'type' => 'select',
-
-                         'css' =>'line-height: inherit',
-
-
-
+                       'css' =>'line-height: inherit',
                         'description' => __('Seleccione el estado del pedido que se aplicará a la hora de aceptar y confirmar el pago de la orden', 'epayco_woocommerce_sub'),
-
-
-
                         'options' => array('epayco-processing'=>"ePayco Procesando Pago","epayco-completed"=>"ePayco Pago Completado"),
-
-
-
-                    ),
-
-
-
-
-
+                     ),
 
 
                     'epayco_url_response_sub' => array(
-
-
-
                         'title' => __('Página de Respuesta', 'epayco_woocommerce_sub'),
-
-
-
                         'type' => 'select',
-
-                         'css' =>'line-height: inherit',
-
-
-
+                        'css' =>'line-height: inherit',
                         'description' => __('Url de la tienda donde se redirecciona al usuario luego de pagar el pedido', 'epayco_woocommerce_sub'),
-
-
-
                         'options'       => $this->get_pages(__('Seleccionar pagina', 'payco-woocommerce')),
-
-
-
                     ),
-
-
-
-
-
 
 
                     'epayco_url_confirmation_sub' => array(
-
-
-
                         'title' => __('Página de Confirmación', 'epayco_woocommerce_sub'),
-
-
-
                         'type' => 'select',
-
                          'css' =>'line-height: inherit',
-
-
-
                         'description' => __('Url de la tienda donde ePayco confirma el pago', 'epayco_woocommerce_sub'),
-
-
-
                         'options'       => $this->get_pages(__('Seleccionar pagina', 'payco-woocommerce')),
-
-
-
                     ),
-
-
-
-
-
 
 
                     'epayco_reduce_stock_pending_sub' => array(
-
-
-
                         'title' => __('Reducir el stock en transacciones pendientes', 'epayco_woocommerce_sub'),
-
-
-
                         'type' => 'checkbox',
-
-
-
                         'label' => __('Habilitar', 'epayco_woocommerce_sub'),
-
-
-
                         'description' => __('Habilite para reducir el stock en transacciones pendientes', 'epayco_woocommerce_sub'),
-
-
-
                         'default' => 'yes',
-
-
-
                     ),
-
-
-
-
-
-
 
                     'epayco_lang_sub' => array(
-
-
-
                         'title' => __('Idioma del Checkout', 'epayco_woocommerce_sub'),
-
-
-
                         'type' => 'select',
-
-                         'css' =>'line-height: inherit',
-
-
-
+                        'css' =>'line-height: inherit',
                         'description' => __('Seleccione el idioma del checkout', 'epayco_woocommerce_sub'),
-
-
-
                         'options' => array('es'=>"Español","en"=>"Inglés"),
-
-
-
                     ),
-
-
-
-
-
-
-
-                );
-
-
-
+              );
             }
 
-
-
-
-
-
-
             /**
-
-
-
              * @param $order_id
-
-
-
              * @return array
-
-
-
-             */
-
+            */
 
 
             public function process_payment($order_id)
-
-
-
             {
-
-
-
-
                 $order = new WC_Order($order_id);
-
-
-
-
-
-
-
                 $order->reduce_order_stock();
-
-
-
-                
-
-
-
                 if (version_compare( WOOCOMMERCE_VERSION, '2.1', '>=')) {
-
-
-
                     return array(
-
-
-
                         'result'    => 'success',
-
-
-
                         'redirect'  => add_query_arg('order-pay', $order->id, add_query_arg('key', $order->order_key, get_permalink(woocommerce_get_page_id('pay' ))))
-
-
-
                     );
-
-
 
                 } else {
 
-
-
                     return array(
-
-
-
                         'result'    => 'success',
-
-
-
-                        'redirect'  => add_query_arg('order', $order->id, add_query_arg('key', $order->order_key, get_permalink(woocommerce_get_page_id('pay' ))))
-
-
-
-                    );
-
-
-
+                     'redirect'  => add_query_arg('order', $order->id, add_query_arg('key', $order->order_key, get_permalink(woocommerce_get_page_id('pay' ))))
+                 );
                 }
 
-
-
-
-
-
-
             }
-
-
-
-
-
 
 
             function get_pages($title = false, $indent = true) {
-
-
-
-
-
-
-
                 $wp_pages = get_pages('sort_column=menu_order');
-
-
-
                 $page_list = array();
-
-
-
                 if ($title) $page_list[] = $title;
-
-
-
                 foreach ($wp_pages as $page) {
-
-
-
                     $prefix = '';
-
-
-                    if ($indent) {
-
-
-
+                  if ($indent) {
                         $has_parent = $page->post_parent;
-
-
-
                         while($has_parent) {
-
-
-
                             $prefix .=  ' - ';
-
-
-
                             $next_page = get_page($has_parent);
-
-
-
                             $has_parent = $next_page->post_parent;
-
-
-
                         }
-
-
-
                     }
 
                     $page_list[$page->ID] = $prefix . $page->post_title;
-
-
-
                 }
-
-
 
                 return $page_list;
 
-
-
             }
-
-
-
-      
-
-
-
-
 
 
   private function getWooCommerceSubscriptionFromOrderId($orderId)
     {
         $subscriptions = wcs_get_subscriptions_for_order($orderId);
-
         return $subscriptions;
     }
 
  public function getPlansBySubscription(array $subscriptions)
     {
-
-        $plans = [];
-
+     $plans = [];
         foreach ($subscriptions as $key => $subscription){
-
             $total_discount = $subscription->get_total_discount();
             $order_currency = $subscription->get_currency();
-
             $products = $subscription->get_items();
-
             $product_plan = $this->getPlan($products);
-
             $quantity =  $product_plan['quantity'];
             $product_name = $product_plan['name'];
             $product_id = $product_plan['id'];
-
             $plan_tax = $subscription->get_total_tax();
             $plant_base = $subscription->get_subtotal();
             $plan_code = "$product_name-$product_id";
@@ -1324,13 +444,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
     }
 
             /**
-
-
-
              * @param $order_id
-
-
-
              */
 function action_order_status_changed( $order_id ){
     $subscriptions_ids = wcs_get_subscriptions_for_order( $order_id );
@@ -1338,9 +452,7 @@ function action_order_status_changed( $order_id ){
     foreach( $subscriptions_ids as $subscription_id => $subscription_obj )
         if($subscription_obj->order->id == $order_id) break; // Stop the loop
 
-
 }
-
 
             public function receipt_page($order_id)
 
@@ -1409,7 +521,6 @@ function action_order_status_changed( $order_id ){
                 if((int)$tax>0){
 
                 $base_tax2=$tax_base;
-
 
                 $base_tax=number_format($base_tax2, 2);
  
@@ -1936,10 +1047,8 @@ function action_order_status_changed( $order_id ){
          </form>
     </div>
 
-
                 </fieldset>
             </form>
-
 
 <div id="tokenurl" hidden="true">'.$tokenurl.'</div>
 <div id="myarray" hidden="true">'.$datasuscription.'</div>
@@ -1959,423 +1068,137 @@ function action_order_status_changed( $order_id ){
 
 
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-
 <script src="'.$ruta81.'"></script>
-
  <script src="'.$ruta3.'"></script>
-
   <script src="'.$ruta4.'"></script>
-
   <script src="'.$ruta5.'"></script>
-
   <script src="'.$ruta6.'"></script>
-
   <script src="'.$ruta7.'"></script>
-
-<script src="'.$ruta8.'"></script>
-
-
-
-
+   <script src="'.$ruta8.'"></script>
    <script src="'.$ruta9.'"></script>
-
-
-
-
-
 </html>
-
 
                 ',$ruta0,$ruta1,$ruta2,$address_billing,$phone_billing,$email_billing,
                 $name_billing,$ruta3,$ruta4,$ruta5,$ruta6,$ruta7,$ruta8,$ruta9);
 
-
-
-                   
-
-
-
-
-
-
-
                     $js = "if(jQuery('button.epayco-button-render').length)    
-
-
-
                 {
-
-
-
                 jQuery('button.epayco-button-render').css('margin','auto');
-
-
-
                 jQuery('button.epayco-button-render').css('display','block');
-
-
-
                 }
-
-
-
                 ";
 
                 if (version_compare(WOOCOMMERCE_VERSION, '2.1', '>=')){
                     wc_enqueue_js($js);
-
                 }else{
                     $woocommerce->add_inline_js($js);
                 }
 
-
-
             }
-
-
 
 
 
             public function block($message)
-
-
-
             {
 
-
-
                 return 'jQuery("body").block({
-
-
-
                         message: "' . esc_js($message) . '",
-
-
-
                         baseZ: 99999,
-
-
-
                         overlayCSS:
-
-
-
                         {
-
-
-
                             background: "#000",
-
-
-
                             opacity: "0.6",
-
-
-
                         },
-
-
-
                         css: {
-
-
-
                             padding:        "20px",
-
-
-
                             zindex:         "9999999",
-
-
-
                             textAlign:      "center",
-
-
-
                             color:          "#555",
-
-
-
                             border:         "1px solid #aaa",
-
-
-
                             backgroundColor:"#fff",
-
-
-
                             cursor:         "wait",
-
-
-
                             lineHeight:     "24px",
 
-
-
                         }
-
-
-
                     });';
-
-
-
             }
-
-
-
-
 
 
 
             public function agafa_dades($url) {
 
-
-
                 if (function_exists('curl_init')) {
-
-
-
                     $ch = curl_init();
-
-
-
                     $timeout = 5;
-
-
-
                     $user_agent='Mozilla/5.0 (Windows NT 6.1; rv:8.0) Gecko/20100101 Firefox/8.0';
-
-
-
                     curl_setopt($ch, CURLOPT_URL, $url);
-
-
-
                     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-
-
-
                     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-
-
-
                     curl_setopt($ch, CURLOPT_USERAGENT, $user_agent);
-
-
-
                     curl_setopt($ch, CURLOPT_HEADER, 0);
-
-
-
                     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-
-
-
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-
-
-
                     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
-
-
-
                     curl_setopt($ch,CURLOPT_TIMEOUT,$timeout);
-
-
-
                     curl_setopt($ch,CURLOPT_MAXREDIRS,10);
-
-
-
                     $data = curl_exec($ch);
-
-
-
                     curl_close($ch);
-
-
-
                     return $data;
-
-
-
                 }else{
-
-
-
                     $data =  @file_get_contents($url);
-
-
-
                     return $data;
-
-
-
                 }
 
-
-
             }
-
 
 
             public function goter(){
-
-
-
                 $context = stream_context_create(array(
-
-
-
                     'http' => array(
-
-
-
                         'method' => 'POST',
-
-
-
                         'header' => 'Content-Type: application/x-www-form-urlencoded',
-
-
-
                         'protocol_version' => 1.1,
-
-
-
                         'timeout' => 10,
-
-
-
                         'ignore_errors' => true
 
-
-
                     )
-
-
-
                 ));
-
-
 
             }
 
-
-
-
-
-
-
             function check_ePayco_response_sub(){
-
-
-
                 @ob_clean();
-
-
-
                 if ( ! empty( $_REQUEST ) ) {
-
-
-
                     header( 'HTTP/1.1 200 OK' );
-
-
-
                     do_action( "ePayco_init_sub", $_REQUEST );
-
-
-
                 } else {
-
-
 
                     wp_die( __("ePayco Request Failure", 'epayco-woocommerce') );
 
-
-
                 }
-
-
 
             }
 
-
-
-
-
-
-
             /**
-
-
-
              * @param $validationData
-
-
-
              */
-
-
 
             function ePayco_successful_request_sub($validationData)
 
-
-
             {
-
-
-
-               
-
-            
-
                     global $woocommerce;
-
-
-
-
-
 
                     $signature="";
 
-
-
-
-
-
-
                     if(isset($_REQUEST['x_signature'])){
-
-
 
                         $explode=explode('?',$_GET['order_id']);
 
-
-
                         $order_id=$explode[0];
-
-
-
-                  
-
-
 
                         $ref_payco=$_REQUEST['x_ref_payco'];
 
-        
-
-
-
                     }else{
-
-
-
-                       
-
-
 
                         $explode=explode('?',$_GET['order_id']);
 
@@ -2383,146 +1206,51 @@ function action_order_status_changed( $order_id ){
 
                         $order_id=$explode[0];
 
-
-
-                       
-
-
-
                             $strref_payco=explode("=",$explode[1]);
-
-
-
-                  
 
                             $ref_payco=$strref_payco[1];
 
-                          
-
                      if ( !$ref_payco) {
-
-                        $ref_payco=$explode2[0];
-
-                     
-
+                        $ref_payco=$explode2[0];            
                      }
-
-                  
-
-
-
- 
-
-
-
-
 
                             //Consultamos los datos
 
-
-
                             $message = __('Esperando respuesta por parte del servidor.','payco-woocommerce');
-
-
-
-
-    
-                       
+                      
                             $url= 'https://secure.payco.co/pasarela/estadotransaccion?id_transaccion='.$ref_payco;
-
                             $responseData = $this->agafa_dades($url,false,$this->goter());
-
-
-        
-
                             $jsonData = @json_decode($responseData, true);
-
-
-
                             $validationData = $jsonData['data'];
-
-
                            $ref_payco = $validationData['x_ref_payco'];
-
 
                 }
 
-                                            
-
-
-
-
                     //Validamos la firma
-
-                             
-
-
 
                     if ($order_id!="" && $ref_payco!="") {
 
-
-
                         $order = new WC_Order($order_id);
 
-
-
                         $signature = hash('sha256',
-
-
-
-                            $this->epayco_customerid_sub.'^'
-
-
-
-                            .$this->epayco_p_key_sub.'^'
-
-
-
-                            .$validationData['x_ref_payco'].'^'
-
-
-
-                            .$validationData['x_transaction_id'].'^'
-
-
-
-                            .$validationData['x_amount'].'^'
-
-
-
-                            .$validationData['x_currency_code']
-
-
+                            trim($this->epayco_customerid_sub).'^'
+                            .trim($this->epayco_p_key_sub).'^'
+                            .trim($validationData['x_ref_payco']).'^'
+                            .trim($validationData['x_transaction_id']).'^'
+                            .trim($validationData['x_amount']).'^'
+                            .trim($validationData['x_currency_code'])
 
                         );
 
-
-
                     }
-
-
-
-                    
-
-
 
                     $message = '';
 
-
-
                     $messageClass = '';
-
-
 
                     $current_state = $order->get_status();
 
-
-
-
-
-
-
-                    if($signature == $validationData['x_signature']){
+                    if($signature == trim($validationData['x_signature'])){
 
                 switch ((int)$validationData['x_cod_response']) {
 
@@ -2577,59 +1305,6 @@ function action_order_status_changed( $order_id ){
 
 
                             case 2: {
-   $newOrderSuscribe=intval($order_id);
-                            $subscriptions_ids = wcs_get_subscriptions_for_order( $order_id );
-                            foreach( $subscriptions_ids as $subscription_id => $subscription_obj ){
- 
-                             if($subscription_obj->order->id == $order_id) break; // Stop the loop
-                                }
-                            $susCription_id=$subscription_obj->id;
-
-                            if (!$subscription_obj->id) {
-                             $susCription_id=$newOrderSuscribe;
- 
-                                }
-
-
-                        
-                        $subscription = new WC_Subscription($susCription_id);
-
-                        $subscription->payment_failed();
-                       // $subscription->update_status( 'cancelled' );
-                       $subscription->update_status( 'expired' );
-
-
-                            }break;
-
-
-
-                            case 3:{
-
-
-
-
-
-                      
-
-
-                                $message = 'Pago pendiente de aprobación';
-
-
-
-                                $messageClass = 'woocommerce-info';
-
-
-
-
-
-
-                            }break;
-
-
-
-                            case 4:{
-
-
                             $newOrderSuscribe=intval($order_id);
                             $subscriptions_ids = wcs_get_subscriptions_for_order( $order_id );
                             foreach( $subscriptions_ids as $subscription_id => $subscription_obj ){
@@ -2646,160 +1321,88 @@ function action_order_status_changed( $order_id ){
 
                         
                         $subscription = new WC_Subscription($susCription_id);
+
+                        $subscription->payment_failed();
+                       // $subscription->update_status( 'Cancelled' );
+                       $subscription->update_status( 'expired' );
+
+                            }break;
+
+                            case 3:{
+                                $message = 'Pago pendiente de aprobación';
+                                $messageClass = 'woocommerce-info';
+                            }break;
+
+                            case 4:{
+                            $newOrderSuscribe=intval($order_id);
+                            $subscriptions_ids = wcs_get_subscriptions_for_order( $order_id );
+                            foreach( $subscriptions_ids as $subscription_id => $subscription_obj ){
+ 
+                             if($subscription_obj->order->id == $order_id) break; // Stop the loop
+                                }
+                            $susCription_id=$subscription_obj->id;
+
+                            if (!$subscription_obj->id) {
+                             $susCription_id=$newOrderSuscribe;
+ 
+                                }
+                        $subscription = new WC_Subscription($susCription_id);
                         $subscription->payment_failed();
                         $subscription->update_status( 'cancelled', 'Your subscription has been cancelled.' );
                                 $message = 'Pago fallido';
 
-
-
                                 $messageClass = 'woocommerce-error';
-
-
-
                                 $order->update_status('epayco-failed');
-
-
-
                                 $order->add_order_note('Pago fallido');
 
 
-
-
-
-
                             }break;
-
-
 
                             default:{
 
 
-
-
                                 $message = 'Pago '.$_REQUEST['x_transaction_state'];
-
-
-
                                 $messageClass = 'woocommerce-error';
-
-
-
                                 $order->update_status('epayco-failed');
-
-
-
                                 $order->add_order_note($message);
-
-
-
-
-
-
-
                             }break;
 
-
-
-
-
-
-
                         }
-
-
 
                     //validar si la transaccion esta pendiente y pasa a rechazada y ya habia descontado el stock
 
 
-
                     if($current_state == 'epayco-on-hold' || $current_state == 'on-hold'&& ((int)$validationData['x_cod_response'] == 2 || (int)$validationData['x_cod_response'] == 4) && EpaycoOrders::ifStockDiscount($order_id)){
-
-
-
-
-
-
 
                         //si no se restauro el stock restaurarlo inmediatamente
 
-
-
                          $this->restore_order_stock($order_id);
-
-
 
                     };
 
-
-
                     }else {
-
-                        //no incide la firma
+                     //no incide la firma
 
                         $message = 'Firma no valida';
-
-
-
                         $messageClass = 'error';
-
-
-
                         $order->update_status('failed');
-
-
-
                         $order->add_order_note('Failed');
-
-
-
-
-
                     }
-
-
-
-
-
-
-
-                    
-
-
 
                     if (isset($_REQUEST['confirmation'])) {
 
-
-
                         $redirect_url = get_permalink($this->get_option('epayco_url_confirmation_sub'));
-
-
-
-
-
-
 
                         if ($this->get_option('epayco_url_confirmation_sub' ) == 0) {
 
-
-
                             echo "ok";
 
-
-
                             die();
-
-
 
                         }
 
 
-
                     }else{
-
-
-
-
-
 
 
                         if ($this->get_option('epayco_url_response_sub' ) == 0) {
@@ -2829,667 +1432,181 @@ function action_order_status_changed( $order_id ){
                     }
 
 
-
-
-
-
-
-
-
-
-
                     $arguments=array();
-
-
-
-
-
-
-
                     foreach ($validationData as $key => $value) {
-
-
-
                         $arguments[$key]=$value;
-
-
-
                     }
-
-
-
                     unset($arguments["wc-api"]);
-
-
-
-
-
-
-
                     $arguments['msg']=urlencode($message);
-
-
-
                     $arguments['type']=$messageClass;
-
-
-
                     $redirect_url = add_query_arg($arguments , $redirect_url );
-
-
-
-
-
-
-
                     wp_redirect($redirect_url);
-
-
-
                     die();
-
-
 
             }
 
-
-
-
-
-
-
             /**
-
-
-
              * @param $order_id
-
-
-
              */
-
-
 
             public function restore_order_stock($order_id,$operation = 'increase')
 
-
-
             {
-
-
-
-
-
-                  $order = wc_get_order($order_id);
-
-
-
+              $order = wc_get_order($order_id);
                 if (!get_option('woocommerce_manage_stock') == 'yes' && !sizeof($order->get_items()) > 0) {
-
-
-
                     return;
-
-
-
                 }
 
-
-
-
-
-
-
-                foreach ($order->get_items() as $item) {
-
-
-
+             foreach ($order->get_items() as $item) {
                     // Get an instance of corresponding the WC_Product object
-
-
-
                     $product = $item->get_product();
-
-
-
                     $qty = $item->get_quantity(); // Get the item quantity
-
-
-
                     wc_update_product_stock($product, $qty, $operation);
-
-
-
                 }
-
-
 
             }
-
-
-
-
-
 
 
             public function string_sanitize($string, $force_lowercase = true, $anal = false) {
-
-
-
-
-
-
-
                 $strip = array("~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "=", "+", "[", "{", "]",
-
-
-
                                "}", "\\", "|", ";", ":", "\"", "'", "&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;",
-
-
-
                                "â€”", "â€“", ",", "<", ".", ">", "/", "?");
-
-
-
                 $clean = trim(str_replace($strip, "", strip_tags($string)));
-
-
-
                 $clean = preg_replace('/\s+/', "_", $clean);
-
-
-
                 $clean = ($anal) ? preg_replace("/[^a-zA-Z0-9]/", "", $clean) : $clean ;
-
-
-
                 return $clean;
 
-
-
             }
-
-
-
-
-
 
 
             public function getTaxesOrder($order){
-
-
-
-                
-
-
-
                 $taxes=($order->get_taxes());
-
-
-
                 $tax=0;
-
-
-
                 foreach($taxes as $tax){
-
-
-
                     $itemtax=$tax['item_meta']['tax_amount'][0];
-
-
-
-
                 }
-
-
-
                 return $itemtax;
-
-
-
             }
-
-
-
-
-
-
-
         }
-
-
-
-        
-
-
 
         /**
-
-
-
          * @param $methods
-
-
-
          * @return array
-
-
-
          */
 
-
-
         function woocommerce_epayco_add_gateway_sub($methods)
-
-
-
         {
-
-
-
-            $methods[] = 'WC_ePayco_sub';
-
-
-
+           $methods[] = 'WC_ePayco_sub';
             return $methods;
-
-
-
         }
-
-
-
         add_filter('woocommerce_payment_gateways', 'woocommerce_epayco_add_gateway_sub');
-
-
-
-
-
-
-
         function epayco_woocommerce_sub_addon_settings_link_sub( $links ) {
-
-
-
             array_push( $links, '<a href="admin.php?page=wc-settings&tab=checkout&section=epayco_sub">' . __( 'Configuración' ) . '</a>' );
-
-
-
             return $links;
-
-
-
         }
-
-
 
         add_filter( "plugin_action_links_".plugin_basename( __FILE__ ),'epayco_woocommerce_sub_addon_settings_link_sub' );
-
-
-
     }
-
-
-
-
-
 
 
     //Actualización de versión
 
-
-
     global $epayco_db_version_sub;
-
-
-
     $epayco_db_version_sub = '1.0';
-
-
-    function epayco_update_db_check_sub()
-
-
-
+ function epayco_update_db_check_sub()
     {
 
-
-
         global $epayco_db_version_sub;
-
-
-
         $installed_ver = get_option('epayco_db_version_sub');
-
-
-
-
-
-
-
         if ($installed_ver == null || $installed_ver != $epayco_db_version_sub) {
-
-
-
             EpaycoOrders::setup();
-
-
-
             update_option('epayco_db_version_sub', $epayco_db_version_sub);
-
-
-
         }
-
-
-
-
-
-
-
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     add_action('plugins_loaded', 'epayco_update_db_check_sub');
-
-
-
-
-
-
     function register_epayco_order_status_sud() {
-
-
-
         register_post_status( 'wc-epayco-failed', array(
-
-
-
             'label'                     => 'ePayco Pago Fallido',
-
-
-
             'public'                    => true,
-
-
-
             'show_in_admin_status_list' => true,
-
-
-
             'show_in_admin_all_list'    => true,
-
-
-
             'exclude_from_search'       => false,
-
-
-
             'label_count'               => _n_noop( 'ePayco Pago Fallido <span class="count">(%s)</span>', 'ePayco Pago Fallido <span class="count">(%s)</span>' )
-
-
-
         ));
-
-
-
         register_post_status( 'wc-epayco-canceled', array(
-
-
-
             'label'                     => 'ePayco Pago Cancelado',
-
-
-
             'public'                    => true,
-
-
-
             'show_in_admin_status_list' => true,
-
-
-
             'show_in_admin_all_list'    => true,
-
-
-
             'exclude_from_search'       => false,
-
-
-
             'label_count'               => _n_noop( 'ePayco Pago Cancelado <span class="count">(%s)</span>', 'ePayco Pago Cancelado <span class="count">(%s)</span>' )
-
-
-
         ));
-
-
 
         register_post_status( 'wc-epayco-on-hold', array(
-
-
-
             'label'                     => 'ePayco Pago Pendiente',
-
-
-
             'public'                    => true,
-
-
-
             'show_in_admin_status_list' => true,
-
-
-
             'show_in_admin_all_list'    => true,
-
-
-
             'exclude_from_search'       => false,
-
-
-
             'label_count'               => _n_noop( 'ePayco Pago Pendiente <span class="count">(%s)</span>', 'ePayco Pago Pendiente <span class="count">(%s)</span>' )
-
-
-
         ));
-
-
 
         register_post_status( 'wc-epayco-processing', array(
-
-
-
             'label'                     => 'ePayco Procesando Pago',
-
-
-
             'public'                    => true,
-
-
-
             'show_in_admin_status_list' => true,
-
-
-
             'show_in_admin_all_list'    => true,
-
-
-
             'exclude_from_search'       => false,
-
-
-
             'label_count'               => _n_noop( 'ePayco Procesando Pago <span class="count">(%s)</span>', 'ePayco Procesando Pago <span class="count">(%s)</span>' )
-
-
-
         ));
 
-
-
-        register_post_status( 'wc-epayco-completed', array(
-
-
+       register_post_status( 'wc-epayco-completed', array(
 
             'label'                     => 'ePayco Pago Completado',
-
-
-
             'public'                    => true,
-
-
-
             'show_in_admin_status_list' => true,
-
-
-
             'show_in_admin_all_list'    => true,
-
-
-
             'exclude_from_search'       => false,
-
-
-
             'label_count'               => _n_noop( 'ePayco Pago Completado <span class="count">(%s)</span>', 'ePayco Pago Completado <span class="count">(%s)</span>' )
-
-
 
         ));
 
 
 
     }
-
-
-
-
 
 
 
     add_action( 'plugins_loaded', 'register_epayco_order_status_sud' );
 
-
-
-
-
-
     function add_epayco_to_order_statuses_sub( $order_statuses ) {
-
-
-
-
-
-
-
         $new_order_statuses = array();
-
-
-
-
-
-
-
         foreach ( $order_statuses as $key => $status ) {
-
-
-
-
-
-
-
             $new_order_statuses[ $key ] = $status;
-
-
-
             if ( 'wc-cancelled' === $key ) {
-
-
-
                 $new_order_statuses['wc-epayco-cancelled'] = 'ePayco Pago Cancelado';
-
-
-
             }
-
-
-
             if ( 'wc-failed' === $key ) {
-
-
-
                 $new_order_statuses['wc-epayco-failed'] = 'ePayco Pago Fallido';
-
-
-
             }
-
-
 
             if ( 'wc-on-hold' === $key ) {
-
-
-
                 $new_order_statuses['wc-epayco-on-hold'] = 'ePayco Pago Pendiente';
-
-
-
             }
-
-
 
             if ( 'wc-processing' === $key ) {
-
-
-
                 $new_order_statuses['wc-epayco-processing'] = 'ePayco Procesando Pago';
-
-
-
             }
-
-
 
             if ( 'wc-completed' === $key ) {
-
-
-
                 $new_order_statuses['wc-epayco-completed'] = 'ePayco Pago Completado';
 
-
-
             }
-
-
 
         }
 
-
-
-
-
-
-
         return $new_order_statuses;
-
-
 
     }
 
@@ -3498,142 +1615,54 @@ function action_order_status_changed( $order_id ){
 
     add_filter( 'wc_order_statuses', 'add_epayco_to_order_statuses_sub' );
 
-
-
-
-
-
-
     add_action('admin_head', 'styling_admin_order_list_sub' );
 
     function styling_admin_order_list_sub() {
 
 
-
         global $pagenow, $post;
-
-
-
-
-
-
 
         if( $pagenow != 'edit.php') return; // Exit
 
-
-
         if( get_post_type($post->ID) != 'shop_order' ) return; // Exit
-
-
-
-
-
-
 
         // HERE we set your custom status
 
-
-
         $order_status_failed = 'epayco-failed';
-
-
-
         $order_status_on_hold = 'epayco-on-hold';
-
-
-
         $order_status_processing = 'epayco-processing';
-
-
-
         $order_status_completed = 'epayco-completed';
-
-
 
         ?>
 
-
-
         <style>
 
-
-
             .order-status.status-<?php echo sanitize_title( $order_status_failed); ?> {
-
-
-
                 background: #eba3a3;
-
-
-
                 color: #761919;
-
-
-
             }
-
-
 
             .order-status.status-<?php echo sanitize_title( $order_status_on_hold); ?> {
-
-
-
                 background: #f8dda7;
-
-
-
                 color: #94660c;
-
-
-
-            }
-
-
-
+          }
             .order-status.status-<?php echo sanitize_title( $order_status_processing ); ?> {
-
-
-
                 background: #c8d7e1;
-
-
-
                 color: #2e4453;
-
-
-
             }
 
 
 
             .order-status.status-<?php echo sanitize_title( $order_status_completed ); ?> {
-
-
-
                 background: #d7f8a7;
-
-
-
                 color: #0c942b;
-
-
-
             }
-
-
 
         </style>
 
-
-
         <?php
 
-
-
     }
-
-
-
 
 
 }
