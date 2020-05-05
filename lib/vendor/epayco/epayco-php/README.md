@@ -104,6 +104,29 @@ $customer = $epayco->customer->delete(array(
     ));
 ```
 
+#### Add new token default to card existed
+
+```php
+  $customer = $epayco->customer->addDefaultCard(array(
+     "customer_id"=>"id_client",
+     "token" => "**********zL4gFB",
+     "franchise"=> "american-express",
+     "mask"=> "373118*****7642"
+ ));
+
+```
+
+#### Add new token to customer existed
+
+```php
+    $customer = $epayco->customer->addNewToken(array(
+    "token_card" => "HyjnY3pBSjFtiQBRT",
+    "customer_id"=>"id_client"
+));
+
+```
+
+
 ### Plans
 
 #### Create
@@ -149,7 +172,10 @@ $sub = $epayco->subscriptions->create(array(
   "customer" => "id_client",
   "token_card" => "id_token",
   "doc_type" => "CC",
-  "doc_number" => "5234567"
+  "doc_number" => "5234567",
+   //Optional parameter: if these parameter it's not send, system get ePayco dashboard's url_confirmation
+   "url_confirmation" => "https://ejemplo.com/confirmacion",
+   "method_confirmation" => "POST"
 ));
 ```
 
@@ -183,7 +209,7 @@ $sub = $epayco->subscriptions->charge(array(
   "address" => "cr 44 55 66",
   "phone"=> "2550102",
   "cell_phone"=> "3010000001",
-   "ip" => "190.000.000.000"  // This is the client's IP, it is required
+  "ip" => "190.000.000.000"  // This is the client's IP, it is required
 ));
 ```
 
@@ -208,9 +234,11 @@ $pse = $epayco->bank->create(array(
         "email" => "no-responder@payco.co",
         "country" => "CO",
         "cell_phone" => "3010000001",
-        "url_response" => "https:/secure.payco.co/restpagos/testRest/endpagopse.php",
-        "url_confirmation" => "https:/secure.payco.co/restpagos/testRest/endpagopse.php",
+        "ip" => "190.000.000.000",  // This is the client's IP, it is required
+        "url_response" => "https://ejemplo.com/respuesta.html",
+        "url_confirmation" => "https://ejemplo.com/confirmacion",
         "method_confirmation" => "GET",
+
         //Extra params: These params are optional and can be used by the commerce
         "extra1" => "",
         "extra2" => "",
@@ -266,11 +294,33 @@ $cash = $epayco->cash->create("efecty", array(
     "email" => "test@mailinator.com",
     "cell_phone" => "3010000001",
     "end_date" => "data_max_5_days",
-    "url_response" => "https:/secure.payco.co/restpagos/testRest/endpagopse.php",
-    "url_confirmation" => "https:/secure.payco.co/restpagos/testRest/endpagopse.php",
+    "ip" => "190.000.000.000",  // This is the client's IP, it is required
+    "url_response" => "https://ejemplo.com/respuesta.html",
+    "url_confirmation" => "https://ejemplo.com/confirmacion",
     "method_confirmation" => "GET",
+
+    //Extra params: These params are optional and can be used by the commerce
+    "extra1" => "",
+    "extra2" => "",
+    "extra3" => "",
+    "extra4" => "",
+    "extra5" => "",
+    "extra6" => "",
+    "extra7" => "",
 ));
 ```
+
+
+#### list
+
+```php
+$cash = $epayco->cash->create("efecty", array());
+$cash = $epayco->cash->create("gana", array());
+$cash = $epayco->cash->create("baloto", array());//expiration date can not be longer than 30 days
+$cash = $epayco->cash->create("redservi", array());//expiration date can not be longer than 30 days
+$cash = $epayco->cash->create("puntored", array());//expiration date can not be longer than 30 days
+```
+
 
 #### Retrieve
 
@@ -320,9 +370,19 @@ $pay = $epayco->charge->create(array(
     "address" => "cr 44 55 66",
     "phone"=> "2550102",
     "cell_phone"=> "3010000001",
+    "ip" => "190.000.000.000",  // This is the client's IP, it is required
     "url_response" => "https://tudominio.com/respuesta.php",
     "url_confirmation" => "https://tudominio.com/confirmacion.php",
-    "ip" => "190.000.000.000"  // This is the client's IP, it is required
+
+    //Extra params: These params are optional and can be used by the commerce
+    "use_default_card_customer" => true,/*if the user wants to be charged with the card that the customer currently has as default = true*/
+    "extra1" => "",
+    "extra2" => "",
+    "extra3" => "",
+    "extra4" => "",
+    "extra5" => "",
+    "extra6" => "",
+    "extra7" => "",
 ));
 ```
 

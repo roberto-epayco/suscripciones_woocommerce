@@ -2251,7 +2251,16 @@ return data;
 
               session: id
 
-            }
+            },
+                beforeSend:function(){
+                $("#signup-form").hide(); 
+$("#mostrardatos21").css("padding", "10%"); 
+$("#mostrardatos21").html('<div class="lds-dual-ring"></div><button class="btn btn-light" disabled>Loading<div class="spinner-grow text-dark" role="status" style="width:1rem; height: 1rem;"><span class="sr-only">Loading...</span></div><div class="spinner-grow text-dark" role="status"  style="width:1rem; height: 1rem;"><span class="sr-only">Loading...</span></div><div class="spinner-grow text-dark" role="status"  style="width:1rem; height: 1rem;"><span class="sr-only">Loading...</span></div>  <div class="spinner-grow text-dark" role="status"  style="width:1rem; height: 1rem;"><span class="sr-only">Loading...</span></div><div class="spinner-grow text-dark" role="status" style="width:1rem; height: 1rem;"><span class="sr-only">Loading...</span></div></button>');
+ },
+                 success: function(done){
+                 // console.log('ready')
+               // callback(done.data.token)
+                 }
 
           })
 
@@ -2301,8 +2310,13 @@ return data;
                 data: {
                   values: json
                 },
+                beforeSend:function(){
+                $("#signup-form").hide(); 
+$("#mostrardatos21").css("padding", "10%"); 
+$("#mostrardatos21").html('<div class="lds-dual-ring"></div><button class="btn btn-light" disabled>Loading<div class="spinner-grow text-dark" role="status" style="width:1rem; height: 1rem;"><span class="sr-only">Loading...</span></div><div class="spinner-grow text-dark" role="status"  style="width:1rem; height: 1rem;"><span class="sr-only">Loading...</span></div><div class="spinner-grow text-dark" role="status"  style="width:1rem; height: 1rem;"><span class="sr-only">Loading...</span></div>  <div class="spinner-grow text-dark" role="status"  style="width:1rem; height: 1rem;"><span class="sr-only">Loading...</span></div><div class="spinner-grow text-dark" role="status" style="width:1rem; height: 1rem;"><span class="sr-only">Loading...</span></div></button>');
+ },
                  success: function(done){
-                   //console.log('LLEGO',done)
+                 //  console.log('ready')
                // callback(done.data.token)
                  },
                  error: function() {
@@ -2933,7 +2947,7 @@ return data;
 
             if (result) {
              // debugger
-//console.log('sisas')
+//console.log('yes')
               callback(error, result);
 
             }

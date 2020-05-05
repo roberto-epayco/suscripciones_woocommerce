@@ -15,6 +15,7 @@ class Client extends GraphqlClient
 
     const BASE_URL = "https://api.secure.payco.co";
     const BASE_URL_SECURE = "https://secure.payco.co";
+
     const IV = "0000000000000000";
     const LENGUAGE = "php";
 
@@ -38,7 +39,9 @@ class Client extends GraphqlClient
         $test,
         $switch,
         $lang,
-        $cash = null
+        $cash = null,
+        $safetyp = null,
+        $card = null
     ) {
 
         /**
@@ -50,21 +53,33 @@ class Client extends GraphqlClient
          * Switch traslate keys array petition in secure
          */
         if ($switch && is_array($data)) {
+            if ($safetyp) {
+             $data = $util->setKeys($data, $safetyp);
+            }else{
             $data = $util->setKeys($data);
+          }
         }
+        /**
+         * Set heaToken bearer
+         */
+   //    $dataAuth =$this->authentication($api_key,$private_key);
+   //  $auth=gettype($dataAuth);
+   // $json = json_decode($dataAuth);
+   // $bearer_token=$json->bearer_token;
 
         /**
          * Set headers
          */
-        $headers= array("Content-Type" => "application/json", "Accept" => "application/json", "type" => "sdk");
+         // $headers= array("Content-Type" => "application/json","Accept" => "application/json","Type"=>'sdk-jwt',"Authorization"=>'Bearer '.$bearer_token, "lang"=>"PHP" );
+         $headers= array("Content-Type" => "application/json","Accept" => "application/json","Type"=>'sdk', "lang"=>"PHP" );
 
         try {
             $options = array(
-                'auth' => new \Requests_Auth_Basic(array($api_key, '')),
+              'auth' => new \Requests_Auth_Basic(array($api_key, '')),
                 'timeout' => 120,
                 'connect_timeout' => 120,
             );
-            
+
             if ($method == "GET") {
                 if ($switch) {
                     if($test){
@@ -78,13 +93,31 @@ class Client extends GraphqlClient
                     $response = \Requests::get(Client::BASE_URL . $url, $headers, $options);
                 }
             } elseif ($method == "POST") {
+
                 if ($switch) {
                     $data = $util->mergeSet($data, $test, $lang, $private_key, $api_key , $cash);
+
                     $response = \Requests::post(Client::BASE_URL_SECURE . $url, $headers, json_encode($data), $options);
                 } else {
-                    $data["ip"] = isset($data["ip"]) ? $data["ip"] : getHostByName(getHostName());
+ 
+                    if ($card) {
+         //    var_dump(Client::BASE_URL_SECURE . $url,json_encode($data),$headers);
+         // die();
+                          $response = \Requests::post(Client::BASE_URL . $url, $headers, json_encode($data), $options);
+                    }else{
+       
+                  $data["ip"] = isset($data["ip"]) ? $data["ip"] : getHostByName(getHostName());
                     $data["test"] = $test;
-                    $response = \Requests::post(Client::BASE_URL . $url, $headers, json_encode($data), $options);
+                  
+                     $response = \Requests::post(Client::BASE_URL . $url, $headers, json_encode($data), $options);
+                    }
+  
+                }
+                if ($safetyp) {
+                    $headers2= array( "Accept" => "multipart/form-data");
+                    $data = $util->mergeSet($data, $test, $lang, $private_key, $api_key , $cash);
+                         $response = \Requests::post(Client::BASE_URL_SECURE . $url, $headers2,$data, $options);
+                      
                 }
             } elseif ($method == "DELETE") {
                 $response = \Requests::delete(Client::BASE_URL . $url, $headers, $options);
@@ -160,4 +193,38 @@ class Client extends GraphqlClient
         }
 
     }
+
+    public function authentication($api_key,$private_key)
+    {  
+        $data = array(
+                'public_key' => $api_key,
+                'private_key' => $private_key
+            );
+         $json=  json_encode($data);
+$curl = curl_init();
+
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.secure.payco.co/v1/auth/login",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 0,
+  CURLOPT_FOLLOWLOCATION => true,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "POST",
+  CURLOPT_POSTFIELDS =>$json,
+  CURLOPT_HTTPHEADER => array(
+    "Content-Type: application/json",
+    "type: sdk-jwt",
+    "Accept: application/json"
+  ),
+));
+
+$response = curl_exec($curl);
+
+curl_close($curl);
+
+         return $response;
+    }
 }
+

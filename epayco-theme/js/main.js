@@ -33,7 +33,6 @@ var finish='Pay';
         onFinished: function (event, currentIndex)
         {
     event.preventDefault();
-
     //captura el contenido del formulario
     var numero_documento=document.getElementById('num_doc').value;
      var nombre_f2=document.getElementById('name').value;

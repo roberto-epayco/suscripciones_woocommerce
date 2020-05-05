@@ -29,7 +29,7 @@ if ( $test=="false") {
    $testt=true;
 
 }
-$ipcustomer = isset($ip) ? $ip : '190.00.00.94' ;
+
 
 
 require_once 'lib/vendor/autoload.php';
@@ -56,6 +56,7 @@ $customer = $epayco->customer->create(array(
     "address" => $addressd,
     "cell_phone"=> $telephone,
 ));
+
  $valorArray= count($myarray2);
 
  
@@ -92,13 +93,14 @@ $sub = $epayco->subscriptions->create(array(
   "cell_phone"=> $telephone,
  
 ));
+
 $subpay = $epayco->subscriptions->charge(array(
   "id_plan" => $id_plan,
   "customer" => $customer->data->customerId,
   "token_card" => $token,
   "doc_type" => $doc,
   "doc_number" => $docunumber,
-  "ip"=>$ipcustomer,
+  "ip"=>$ip,
   "cell_phone"=> $telephone,
   "url_response" => $response,
   "url_confirmation" => $confirmacion,
@@ -106,6 +108,7 @@ $subpay = $epayco->subscriptions->charge(array(
   "city" =>$city,
  
 ));
+
 $factura2 = isset($subpay->data->ref_payco) ? $subpay->data->ref_payco : 'ref_payco' ;
 $factura22=$factura22.$factura2;
 }else{
@@ -121,7 +124,6 @@ $factura22=$factura22.$factura2;
      "trial_days" => $trial_days
 ));
 
-
 $sub = $epayco->subscriptions->create(array(
   "id_plan" => $plan->data->id_plan,
   "customer" => $customer->data->customerId,
@@ -134,20 +136,22 @@ $sub = $epayco->subscriptions->create(array(
   "cell_phone"=> $telephone,
  
 ));
+
+
 $subpay = $epayco->subscriptions->charge(array(
   "id_plan" => $plan->data->id_plan,
   "customer" => $customer->data->customerId,
   "token_card" => $token,
   "doc_type" => $doc,
   "doc_number" => $docunumber,
-  "ip"=>$ipcustomer,
+  "ip"=>$ip,
   "cell_phone"=> $telephone,
   "url_response" => $response,
   "url_confirmation" => $confirmacion,
   "address" => $addressd,
   "city" =>$city,
-
 ));
+
 $factura2 = isset($subpay->data->ref_payco) ? $subpay->data->ref_payco : 'ref_payco' ;
 
 $factura22=$factura22.$factura2;
@@ -157,17 +161,9 @@ $factura22=$factura22.$factura2;
        var_dump('ocurrio un inconveniente interno, algunos datos no son validos, por favor reintentar o comunicarce con soporte tecnico.');
   }
 
-
         };
 
-
-
  }else{
-
-
-
-
-
 
 for ($i=$valorArray; $i >= 0 ; $i--) { 
   $myarr=$myarray2[0];
@@ -182,10 +178,10 @@ for ($i=$valorArray; $i >= 0 ; $i--) {
  $intervalCount_plan= $myarr->interval_count;
  $plan_amout=$myarr->amount;
  }
-  
- 
+   
   try{
   $planconsult = $epayco->plan->get($id_plan);
+
   if($planconsult->status =="true"){
     
 $sub = $epayco->subscriptions->create(array(
@@ -198,22 +194,22 @@ $sub = $epayco->subscriptions->create(array(
   "url_confirmation" => $confirmacion,
   "address" => $addressd,
   "cell_phone"=> $telephone,
- 
 ));
+
 $subpay = $epayco->subscriptions->charge(array(
   "id_plan" => $id_plan,
   "customer" => $customer->data->customerId,
   "token_card" => $token,
   "doc_type" => $doc,
   "doc_number" => $docunumber,
-  "ip"=>$ipcustomer,
+  "ip"=>$ip,
   "cell_phone"=> $telephone,
   "url_response" => $response,
   "url_confirmation" => $confirmacion,
   "address" => $addressd,
   "city" =>$city,
- 
 ));
+
 $factura2 = isset($subpay->data->ref_payco) ? $subpay->data->ref_payco : 'ref_payco' ;
 
 $factura22=$factura2;
@@ -230,7 +226,6 @@ $factura22=$factura2;
      "trial_days" => $trial_days
 ));
 
-
 $sub = $epayco->subscriptions->create(array(
   "id_plan" => $plan->data->id_plan,
   "customer" => $customer->data->customerId,
@@ -241,7 +236,6 @@ $sub = $epayco->subscriptions->create(array(
   "url_confirmation" => $confirmacion,
   "address" => $addressd,
   "cell_phone"=> $telephone,
- 
 ));
 $subpay = $epayco->subscriptions->charge(array(
   "id_plan" => $plan->data->id_plan,
@@ -249,14 +243,14 @@ $subpay = $epayco->subscriptions->charge(array(
   "token_card" => $token,
   "doc_type" => $doc,
   "doc_number" => $docunumber,
-  "ip"=>$ipcustomer,
+  "ip"=>$ip,
   "cell_phone"=> $telephone,
   "url_response" => $response,
   "url_confirmation" => $confirmacion,
   "address" => $addressd,
   "city" =>$city,
-
 ));
+
 $factura2 = isset($subpay->data->ref_payco) ? $subpay->data->ref_payco : 'ref_payco' ;
 
 
@@ -305,13 +299,12 @@ $extra=isset($subpay->data->extra1) ? $subpay->data->extra1 : "";
 if (isset($subpay->data->status) && $subpay->data->status=="error") {
 
           $description=$subpay->data->description;
-
+ var_dump($subpay->data);
            $errors=$subpay->data->errors;
 
           echo $description."<br>"; 
-
-          echo $errors;
-
+  
+    
           die();
 
         }        
@@ -415,3 +408,16 @@ if (isset($subpay->data->status) && $subpay->data->status=="error") {
 
 
 
+<script type="text/javascript">
+    $(document).ready(function(){
+     
+       setTimeout(function(){ 
+ console.log('redirigir')
+ window.location.href = "<?php echo $response."&ref_payco=".$factura2; ?>";
+
+ 
+                    },1000);
+
+
+   })
+</script>
