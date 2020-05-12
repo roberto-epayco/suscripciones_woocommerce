@@ -15,7 +15,8 @@ class Client extends GraphqlClient
 
     const BASE_URL = "https://api.secure.payco.co";
     const BASE_URL_SECURE = "https://secure.payco.co";
-
+    // const BASE_URL = "https://apitest.secure.epayco.io";
+    // const BASE_URL_SECURE = "https://secure.epayco.io";
     const IV = "0000000000000000";
     const LENGUAGE = "php";
 
@@ -59,6 +60,8 @@ class Client extends GraphqlClient
             $data = $util->setKeys($data);
           }
         }
+//42677847
+        
         /**
          * Set heaToken bearer
          */

@@ -509,7 +509,7 @@ function action_order_status_changed( $order_id ){
                $ruta7=plugin_dir_url(__FILE__) .'epayco-theme/vendor/jquery-validation/dist/additional-methods.min.js';
                $ruta8=plugin_dir_url(__FILE__) .'epayco-theme/vendor/jquery-steps/jquery.steps.min.js';
                $ruta9=plugin_dir_url(__FILE__) .'epayco-theme/js/main.js';
-               $ruta81=plugin_dir_url(__FILE__) .'epayco-theme/assets/js/validate.epayco.js';
+               $ruta81=plugin_dir_url(__FILE__) .'epayco-theme/assets/js/validate.epayco.min.js';
 
 
       

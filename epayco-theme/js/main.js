@@ -1,11 +1,6 @@
 (function($) {
-
- 
            $.getJSON("https://api.ipify.org?format=json", 
                                           function(data) { 
-  
-            // Setting text of element P with id 
-       
             $("#ip").html(data.ip); 
         }); 
       var lang = $("#lang").text();
