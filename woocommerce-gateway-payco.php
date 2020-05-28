@@ -7,7 +7,7 @@
  * Plugin Name:       ePayco WooCommerce  Suscripction
  * Description:       Plugin ePayco WooCommerce.
  * Version:           4.0.x
- * Author:            Ricardo saldarriaga
+ * Author:            ePayco
  * Author URI:        
  *Lice
  * Domain Path:       /languages
