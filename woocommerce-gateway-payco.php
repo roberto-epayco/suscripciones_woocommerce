@@ -489,13 +489,9 @@ function action_order_status_changed( $order_id ){
                 $base_tax=number_format($amoutTotal, 2);
                 $tax=number_format(0, 2);
                 }
-
                 if (!EpaycoOrders::ifExist($order_id)) {
-
                     $this->restore_order_stock($order_id);
-
                     EpaycoOrders::create($order_id,1);
-
                 }
 
 
@@ -511,9 +507,6 @@ function action_order_status_changed( $order_id ){
                $ruta9=plugin_dir_url(__FILE__) .'epayco-theme/js/main.js';
                $ruta81=plugin_dir_url(__FILE__) .'epayco-theme/assets/js/validate.epayco.min.js';
 
-
-      
-              
                $tokenurl=plugin_dir_url(__FILE__) .'token.php';
               if($this->epayco_lang_sub=='es'){
                  $tadle= ' 
@@ -1182,7 +1175,8 @@ function action_order_status_changed( $order_id ){
                     }
                         
                         $subscription = new WC_Subscription($susCription_id);
-                        $x_id_factura = $validationData['x_id_factura'];
+                        //$x_id_factura = $validationData['x_id_factura'];
+                        $x_id_factura = $validationData['x_id_invoice'];
                         $x_id_factura = explode('-', $x_id_factura);
                         $subscription_id = $x_id_factura[0];
 
@@ -1256,7 +1250,7 @@ function action_order_status_changed( $order_id ){
                             }break;
 
                             default:{
-                                $message = 'Pago '.$_REQUEST['x_transaction_state'];
+                                $message = 'Pago fallido';
                                 $messageClass = 'woocommerce-error';
                                 $order->update_status('epayco-failed');
                                 $order->add_order_note($message);
@@ -1266,7 +1260,7 @@ function action_order_status_changed( $order_id ){
 
                     //validar si la transaccion esta pendiente y pasa a rechazada y ya habia descontado el stock
 
-                    if($current_state == 'epayco-on-hold' || $current_state == 'on-hold'&& ((int)$validationData['x_cod_response'] == 2 || (int)$validationData['x_cod_response'] == 4) && EpaycoOrders::ifStockDiscount($order_id)){
+                    if($current_state == 'epayco-on-hold' || $current_state == 'on-hold'&& ((int)$validationData['x_cod_transaction_state'] == 2 || (int)$validationData['x_cod_transaction_state'] == 4) && EpaycoOrders::ifStockDiscount($order_id)){
 
                         //si no se restauro el stock restaurarlo inmediatamente
                          $this->restore_order_stock($order_id);
