@@ -1167,7 +1167,7 @@ function action_order_status_changed( $order_id ){
                     if($signature == trim($validationData['x_signature']))
                     {
 
-                switch ((int)$validationData['x_cod_response']) {
+                switch ((int)$validationData['x_cod_transaction_state']) {
                         case 1:{
                             $newOrderSuscribe=intval($order_id);
                             $subscriptions_ids = wcs_get_subscriptions_for_order( $order_id );
