@@ -82,7 +82,7 @@ $customer = $epayco->customer->create(array(
   if($planconsult->status =="true"){
     
 $sub = $epayco->subscriptions->create(array(
-  "id_plan" => $id_plan,
+  "id_plan" => (string)$id_plan,
   "customer" => $customer->data->customerId,
   "token_card" => $token,
   "doc_type" => $doc,
@@ -95,7 +95,7 @@ $sub = $epayco->subscriptions->create(array(
 ));
 
 $subpay = $epayco->subscriptions->charge(array(
-  "id_plan" => $id_plan,
+  "id_plan" => (string)$id_plan,
   "customer" => $customer->data->customerId,
   "token_card" => $token,
   "doc_type" => $doc,
@@ -114,9 +114,9 @@ $factura22=$factura22.$factura2;
 }else{
   
      $plan = $epayco->plan->create(array(
-     "id_plan" =>  $id_plan,
-     "name" =>$id_plan_nombre,
-     "description" => $idescription_plan,
+     "id_plan" =>  (string)$id_plan,
+     "name" =>(string)$id_plan_nombre,
+     "description" =>(string) $idescription_plan,
      "amount" => (float)$plan_amout,
      "currency" => $currency_plan,
      "interval" => $intervel_plan,
@@ -185,7 +185,7 @@ for ($i=$valorArray; $i >= 0 ; $i--) {
   if($planconsult->status =="true"){
     
 $sub = $epayco->subscriptions->create(array(
-  "id_plan" => $id_plan,
+  "id_plan" => (string)$id_plan,
   "customer" => $customer->data->customerId,
   "token_card" => $token,
   "doc_type" => $doc,
@@ -197,7 +197,7 @@ $sub = $epayco->subscriptions->create(array(
 ));
 
 $subpay = $epayco->subscriptions->charge(array(
-  "id_plan" => $id_plan,
+  "id_plan" =>(string)$id_plan,
   "customer" => $customer->data->customerId,
   "token_card" => $token,
   "doc_type" => $doc,
@@ -216,9 +216,9 @@ $factura22=$factura2;
   }else{
  
      $plan = $epayco->plan->create(array(
-     "id_plan" =>  $id_plan,
-     "name" =>$id_plan_nombre,
-     "description" => $idescription_plan,
+     "id_plan" =>  (string)$id_plan,
+     "name" =>(string)$id_plan_nombre,
+     "description" =>(string)$idescription_plan,
      "amount" => (float)$plan_amout,
      "currency" => $currency_plan,
      "interval" => $intervel_plan,
@@ -299,11 +299,11 @@ $extra=isset($subpay->data->extra1) ? $subpay->data->extra1 : "";
 if (isset($subpay->data->status) && $subpay->data->status=="error") {
 
           $description=$subpay->data->description;
- var_dump($subpay->data);
+ ///var_dump($subpay->data);
            $errors=$subpay->data->errors;
 
           echo $description."<br>"; 
-  
+          echo $errors."<br>"; 
     
           die();
 
