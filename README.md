@@ -48,3 +48,4 @@
 * [ePayco plugin WooCommerce v3.9.x](https://github.com/epayco/suscripciones_woocommerce/releases/tag/v2.6).
 * [ePayco plugin WooCommerce v4.x](https://github.com/epayco/suscripciones_woocommerce/releases/tag/v4.x).
 * [ePayco plugin WooCommerce v4.3](https://github.com/epayco/suscripciones_woocommerce/releases/tag/v4.3).
+* [ePayco plugin WooCommerce v4.9](https://github.com/epayco/suscripciones_woocommerce/releases/tag/v4.9).
