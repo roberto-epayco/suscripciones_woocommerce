@@ -20,7 +20,7 @@
 
 ## Instalación
 
-1. [Descarga el plugin.](https://github.com/epayco/suscripciones_woocommerce/releases/tag/v2.6)
+1. [Descarga el plugin.](https://github.com/epayco/suscripciones_woocommerce#versiones)
 2. Ingresa al administrador de tu wordPress.
 3. Ingresa a Plugins / Añadir-Nuevo / Subir-Plugin. 
 4. Busca el plugin descargado en tu equipo y súbelo como cualquier otro archivo.
