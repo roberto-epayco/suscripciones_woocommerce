@@ -37,7 +37,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                 $this->icon = 'https://369969691f476073508a-60bf0867add971908d4f26a64519c2aa.ssl.cf5.rackcdn.com/logos/logo_epayco_200px.png';
                 $this->method_title = __('ePayco Checkout Suscription', 'epayco_woocommerce_sub');
                 $this->method_description = __('Suscripciones atravez de tarjetas de crédito.', 'epayco_woocommerce_sub');
-                $this->order_button_text = __('Pay', 'epayco_woocommerce_sub');
+                $this->order_button_text = __('Pagar', 'epayco_woocommerce_sub');
                 $this->has_fields = true;
                $this->supports = [
             'subscriptions'
