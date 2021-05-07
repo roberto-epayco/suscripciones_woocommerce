@@ -960,7 +960,7 @@ function action_order_status_changed( $order_id ){
               <span class="input-group-text" id="addon-wrapping"><i class="fas fa-calendar-alt"></i></span>
             </div>
           <input type="text" data-epayco="card[exp_month]" id="exp_month" onkeypress="return event.charCode >= 48 && event.charCode <= 57" maxlength="2" placeholder="MM"  required>
-        <input type="text" data-epayco="card[exp_year]" id="exp_year" onkeypress="return event.charCode >= 48 && event.charCode <= 57" maxlength="4" minlength="4"required placeholder="YY">
+        <input type="text" data-epayco="card[exp_year]" id="exp_year" onkeypress="return event.charCode >= 48 && event.charCode <= 57" maxlength="4" minlength="4"required placeholder="YYYY">
             <svg id="ccicon" class="ccicon" width="750" height="471" viewBox="0 0 750 471" version="1.1" xmlns="http://www.w3.org/2000/svg"
                 xmlns:xlink="http://www.w3.org/1999/xlink">
             </svg>
