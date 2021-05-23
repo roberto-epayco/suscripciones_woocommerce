@@ -746,8 +746,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
                                         <fieldset>
                                             <div class="form-row">
                                                 <div class="form-group">   
-                                                    '.$tadle.'  
-                                                </div>
+                                                '.$tadle.'
                                             </div>
                                         </fieldset>
                                         <h3>
